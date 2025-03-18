@@ -1,0 +1,23 @@
+{
+  "name": "alexsam20/mylessons",
+  "authors": [
+    {
+      "name": "alex",
+      "email": "alsam3637@gmail.com"
+    }
+  ],
+  "config": {
+    "sort-packages": true
+  },
+  "require": {
+    "php": ">=8.3"
+  },
+  "require-dev": {
+    "roave/security-advisories": "dev-master"
+  },
+    "autoload": {
+        "psr-4": {
+            "Framework\\": "src/Framework/"
+        }
+    }
+}

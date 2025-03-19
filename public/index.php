@@ -1,6 +1,7 @@
 <?php
 
-use Framework\Http\Request;
+use Framework\Http\RequestFactory;
+use Framework\Http\Response;
 
 chdir(dirname(__DIR__));
 require 'vendor/autoload.php';
@@ -10,10 +11,16 @@ function print_pre($var, $flag = 0)
     if ($flag !== 0) {exit();}
 }
 
-$request = new Request();
-$request->withQueryParams($_GET);
-$request->withParsedBody($_POST);
+$request = RequestFactory::fromGlobals();
 
 $name = $request->getQueryParams()['name'] ?? 'Guest';
-header('X-Developer: AlexSaM');
-echo 'Hello, ' . $name . '!' . PHP_EOL;
+
+$response = new Response('Hello, ' . $name . '!');
+$response->withHeader('X-Developer', 'AlexSaM');
+
+header('HTTP/1.0 ' . $response->getStatusCode() . ' ' . $response->getReasonPhrase());
+foreach ($response->getHeaders() as $name => $values) {
+    header($name . ': ' . $values);
+}
+
+echo $response->getBody();

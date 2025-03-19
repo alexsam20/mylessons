@@ -1,6 +1,6 @@
 <?php
 
-namespace Framework\HTTP;
+namespace Framework\Http;
 class Request
 {
     public function getQueryParams(): array

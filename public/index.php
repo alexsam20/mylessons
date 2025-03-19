@@ -15,8 +15,8 @@ $request = RequestFactory::fromGlobals();
 
 $name = $request->getQueryParams()['name'] ?? 'Guest';
 
-$response = new Response('Hello, ' . $name . '!');
-$response->withHeader('X-Developer', 'AlexSaM');
+$response = (new Response('Hello, ' . $name . '!'))
+    ->withHeader('X-Developer', 'AlexSaM');
 
 header('HTTP/1.0 ' . $response->getStatusCode() . ' ' . $response->getReasonPhrase());
 foreach ($response->getHeaders() as $name => $values) {

@@ -2,14 +2,18 @@
 
 namespace Framework\Http;
 
-class Response
+use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
+
+class Response implements ResponseInterface
 {
     private array $headers = [];
-    private $body;
+    private StreamInterface $body;
     private int $statusCode;
     private string $reasonPhrase = '';
 
-    private static $phrases = [
+    private static array $phrases = [
         200 => 'OK',
         301 => 'Moved Permanently',
         400 => 'Bad Request',
@@ -20,16 +24,16 @@ class Response
 
     public function __construct($body, int $status = 200)
     {
-        $this->body = $body;
+        $this->body = $body instanceof StreamInterface ? $body : new Stream($body);
         $this->statusCode = $status;
     }
 
-    public function getBody()
+    public function getBody(): StreamInterface
     {
         return $this->body;
     }
 
-    public function withBody($body): self
+    public function withBody(StreamInterface $body): self
     {
         $new = clone $this;
         $new->body = $body;
@@ -41,7 +45,7 @@ class Response
         return $this->statusCode;
     }
 
-    public function getReasonPhrase()
+    public function getReasonPhrase(): string
     {
         if (!$this->reasonPhrase && isset(self::$phrases[$this->statusCode])) {
             $this->reasonPhrase = self::$phrases[$this->statusCode];
@@ -64,28 +68,47 @@ class Response
         return $this->headers;
     }
 
-    public function hasHeader($headers): bool
+    public function hasHeader($name): bool
     {
-        return isset($this->headers[$headers]);
+        return isset($this->headers[$name]);
     }
 
-    public function getHeader($header)
+    public function getHeader($name): array
     {
-        if (!$this->hasHeader($header)) {
-            return null;
+        if (!$this->hasHeader($name)) {
+            return [];
         }
-
-        return $this->headers[$header];
+        return $this->headers[$name];
     }
 
-    public function withHeader($header, $value): self
+    public function withHeader($name, $value): self
     {
         $new = clone $this;
-        if ($new->hasHeader($header)) {
-            unset($new->headers[$header]);
+        if ($new->hasHeader($name)) {
+            unset($new->headers[$name]);
         }
-        $new->headers[$header] = $value;
+        $new->headers[$name] = $value;
 
         return $new;
     }
+
+    public function withAddedHeader(string $name, $value): MessageInterface
+    {
+        $new = clone $this;
+        $new->headers[$name] = array_merge($new->headers[$name] ?? [], (array)$value);
+        return $new;
+    }
+
+    public function withoutHeader(string $name): MessageInterface
+    {
+        $new = clone $this;
+        if ($new->hasHeader($name)) {
+            unset($new->headers[$name]);
+        }
+        return $new;
+    }
+
+    public function getProtocolVersion(): string {}
+    public function withProtocolVersion(string $version): MessageInterface {}
+    public function getHeaderLine(string $name): string {}
 }

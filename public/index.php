@@ -11,6 +11,8 @@ function print_pre($var, $flag = 0)
 }
 
 $request = new Request();
+$request->withQueryParams($_GET);
+$request->withParsedBody($_POST);
 
 $name = $request->getQueryParams()['name'] ?? 'Guest';
 header('X-Developer: AlexSaM');

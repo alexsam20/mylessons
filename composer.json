@@ -1,24 +1,30 @@
 {
-  "name": "alexsam20/mylessons",
-  "authors": [
-    {
-      "name": "alex",
-      "email": "alsam3637@gmail.com"
-    }
-  ],
-  "config": {
-    "sort-packages": true
-  },
-  "require": {
-    "php": ">=8.3"
-  },
-  "require-dev": {
-    "phpunit/phpunit": "^12.0",
-    "roave/security-advisories": "dev-master"
-  },
+    "name": "alexsam20/mylessons",
+    "authors": [
+        {
+            "name": "alex",
+            "email": "alsam3637@gmail.com"
+        }
+    ],
+    "config": {
+        "sort-packages": true
+    },
+    "require": {
+        "php": ">=8.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.0",
+        "roave/security-advisories": "dev-master"
+    },
     "autoload": {
         "psr-4": {
-            "Framework\\": "src/Framework/"
+            "Framework\\": "src/Framework/",
+            "Tests\\": "tests/"
         }
+    },
+    "scripts": {
+        "serve": "php -S 0.0.0.0:8000 -t public public/index.php",
+        "test": "phpunit --colors=always"
     }
 }
+

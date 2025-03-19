@@ -27,9 +27,9 @@ class ResponseTest extends TestCase
 
     public function testHeaders(): void
     {
-        $response = new Response('');
-        $response->withHeader($name1 = 'X-Header-1', $value1 = 'value_1');
-        $response->withHeader($name2 = 'X-Header-2', $value2 = 'value_2');
+        $response = (new Response(''))
+            ->withHeader($name1 = 'X-Header-1', $value1 = 'value_1')
+            ->withHeader($name2 = 'X-Header-2', $value2 = 'value_2');
 
         self::assertEquals([$name1 => $value1, $name2 => $value2], $response->getHeaders());
 

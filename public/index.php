@@ -1,7 +1,8 @@
 <?php
 
-use Framework\Http\RequestFactory;
-use Framework\Http\Response;
+use Framework\Http\ResponseSender;
+use Laminas\Diactoros\Response\HtmlResponse;
+use Laminas\Diactoros\ServerRequestFactory;
 
 chdir(dirname(__DIR__));
 require 'vendor/autoload.php';
@@ -11,16 +12,12 @@ function print_pre($var, $flag = 0)
     if ($flag !== 0) {exit();}
 }
 
-$request = RequestFactory::fromGlobals();
+$request = ServerRequestFactory::fromGlobals();
 
 $name = $request->getQueryParams()['name'] ?? 'Guest';
 
-$response = (new Response('Hello, ' . $name . '!'))
+$response = (new HtmlResponse('Hello, ' . $name . '!'))
     ->withHeader('X-Developer', 'AlexSaM');
 
-header('HTTP/1.0 ' . $response->getStatusCode() . ' ' . $response->getReasonPhrase());
-foreach ($response->getHeaders() as $name => $values) {
-    header($name . ': ' . $values);
-}
-
-echo $response->getBody();
+$emitter = new ResponseSender();
+$emitter->send($response);

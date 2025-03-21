@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 use Framework\Http\ActionResolver;
 use Framework\Http\Router\Exception\RequestNotMatchedException;
-use Framework\Http\Router\RouteCollection;
 use Framework\Http\Router\SimpleRouter;
 use Laminas\Diactoros\Response\JsonResponse;
 use Laminas\Diactoros\ServerRequestFactory;
@@ -24,14 +23,15 @@ function print_pre(mixed $var, int|bool|string $flag = 0): void
 }
 ### Initialization
 
-$routes = new RouteCollection();
+$aura = new \Aura\Router\RouterContainer();
+$routes = $aura->getMap();
 
 $routes->get('home', '/', App\Http\Action\HelloAction::class);
 $routes->get('about', '/about', App\Http\Action\AboutAction::class);
 $routes->get('blog', '/blog', App\Http\Action\Blog\IndexAction::class);
-$routes->get('blog_show', '/blog/{id}', App\Http\Action\Blog\ShowAction::class, ['id' => '\d+']);
+$routes->get('blog_show', '/blog/{id}', App\Http\Action\Blog\ShowAction::class)->tokens(['id' => '\d+']);
 
-$router = new SimpleRouter($routes);
+$router = new \Framework\Http\Router\AuraRouterAdapter($aura);
 $resolver = new ActionResolver();
 
 ### Running

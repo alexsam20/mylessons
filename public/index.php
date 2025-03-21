@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
+
+use Framework\Http\ActionResolver;
 use Framework\Http\Router\Exception\RequestNotMatchedException;
 use Framework\Http\Router\RouteCollection;
 use Framework\Http\Router\Router;
-use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\JsonResponse;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
-use Psr\Http\Message\ServerRequestInterface;
 
 chdir(dirname(__DIR__));
 require 'vendor/autoload.php';
@@ -25,15 +25,13 @@ function print_pre(mixed $var, int|bool|string $flag = 0): void
 ### Initialization
 $routes = new RouteCollection();
 
-$routes->get('home', '/', new \App\Http\Action\HelloAction());
-
-$routes->get('about', '/about', new \App\Http\Action\AboutAction());
-
-$routes->get('blog', '/blog', new \App\Http\Action\Blog\IndexAction());
-
-$routes->get('blog_show', '/blog/{id}', new \App\Http\Action\Blog\ShowAction(), ['id' => '\d+']);
+$routes->get('home', '/', App\Http\Action\HelloAction::class);
+$routes->get('about', '/about', App\Http\Action\AboutAction::class);
+$routes->get('blog', '/blog', App\Http\Action\Blog\IndexAction::class);
+$routes->get('blog_show', '/blog/{id}', App\Http\Action\Blog\ShowAction::class, ['id' => '\d+']);
 
 $router = new Router($routes);
+$resolver = new ActionResolver();
 
 ### Running
 
@@ -43,8 +41,7 @@ try{
     foreach ($result->getAttributes() as $attribute => $value) {
         $request = $request->withAttribute($attribute, $value);
     }
-    /** @var callable $action */
-    $action = $result->getHandler();
+    $action = $resolver->resolve($result->getHandler());
     $response = $action($request);
 } catch (RequestNotMatchedException $e) {
     $response = new JsonResponse(['error' => 'Undefined page'], 404);

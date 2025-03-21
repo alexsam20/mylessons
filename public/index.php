@@ -25,29 +25,13 @@ function print_pre(mixed $var, int|bool|string $flag = 0): void
 ### Initialization
 $routes = new RouteCollection();
 
-$routes->get('home', '/', function (ServerRequestInterface $request) {
-    $name = $request->getQueryParams()['name'] ?? 'Guest';
-    return new HtmlResponse('Hello, ' . $name . '!');
-});
+$routes->get('home', '/', new \App\Http\Action\HelloAction());
 
-$routes->get('about', '/about', function () {
-    return new HtmlResponse('I am a simple site');
-});
+$routes->get('about', '/about', new \App\Http\Action\AboutAction());
 
-$routes->get('blog', '/blog', function () {
-    return new JsonResponse([
-        ['id' => 2, 'title' => 'The Second Post'],
-        ['id' => 1, 'title' => 'The First Post'],
-    ]);
-});
+$routes->get('blog', '/blog', new \App\Http\Action\Blog\IndexAction());
 
-$routes->get('blog_show', '/blog/{id}', function (ServerRequestInterface $request) {
-    $id = $request->getAttribute('id');
-    if ($id > 5) {
-        return new JsonResponse(['error' => 'Undefined page'], 404);
-    }
-    return new JsonResponse(['id' => $id, 'title' => 'Post # ' . $id]);
-}, ['id' => '\d+']);
+$routes->get('blog_show', '/blog/{id}', new \App\Http\Action\Blog\ShowAction(), ['id' => '\d+']);
 
 $router = new Router($routes);
 

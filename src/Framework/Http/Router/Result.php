@@ -10,6 +10,9 @@ class Result
         private readonly array $attributes = []
     ) { }
 
+    /**
+     * @return string
+     */
     public function getName(): string
     {
         return $this->name;
@@ -23,6 +26,9 @@ class Result
         return $this->handler;
     }
 
+    /**
+     * @return array
+     */
     public function getAttributes(): array
     {
         return $this->attributes;

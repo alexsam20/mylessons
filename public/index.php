@@ -11,7 +11,13 @@ use Psr\Http\Message\ServerRequestInterface;
 
 chdir(dirname(__DIR__));
 require 'vendor/autoload.php';
-function print_pre($var, $flag = 0): void
+
+/**
+ * @param mixed $var
+ * @param int|bool|string $flag
+ * @return void
+ */
+function print_pre(mixed $var, int|bool|string $flag = 0): void
 {
     echo '<pre>' . print_r($var, true) . '</pre>';
     if ($flag !== 0) { exit(); }

@@ -5,6 +5,7 @@ namespace Tests\Framework\Http;
 use Framework\Http\Router\Exception\RequestNotMatchedException;
 use Framework\Http\Router\RouteCollection;
 use Framework\Http\Router\Router;
+use InvalidArgumentException;
 use Laminas\Diactoros\ServerRequest;
 use Laminas\Diactoros\Uri;
 use PHPUnit\Framework\TestCase;
@@ -59,7 +60,7 @@ class RouterTest extends TestCase
     {
         $routes = new RouteCollection();
 
-        $routes->get($name = 'blog_show', '/blog/{id}', 'handler', ['id' => '\d+']);
+        $routes->get('blog_show', '/blog/{id}', 'handler', ['id' => '\d+']);
 
         $router = new Router($routes);
 
@@ -84,11 +85,11 @@ class RouterTest extends TestCase
     {
         $routes = new RouteCollection();
 
-        $routes->get($name = 'blog_show', '/blog/{id}', 'handler', ['id' => '\d+']);
+        $routes->get('blog_show', '/blog/{id}', 'handler', ['id' => '\d+']);
 
         $router = new Router($routes);
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $router->generate('blog_show', ['slug' => 'post']);
     }
 

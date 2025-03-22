@@ -8,8 +8,18 @@ use SplQueue;
 
 class Pipeline
 {
-    public function __construct(private $queue = new SplQueue())
+    public function __construct(private $queue = new SplQueue()) { }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @param callable $next
+     * @return ResponseInterface
+     */
+    public function __invoke(ServerRequestInterface $request, callable $next): ResponseInterface
     {
+        $delegate = new Next(clone $this->queue, $next);
+
+        return $delegate($request);
     }
 
 
@@ -20,33 +30,5 @@ class Pipeline
     public function pipe(callable $middleware): void
     {
         $this->queue->enqueue($middleware);
-    }
-
-    /**
-     * @param ServerRequestInterface $request
-     * @param callable $default
-     * @return ResponseInterface
-     */
-    public function __invoke(ServerRequestInterface $request, callable $default): ResponseInterface
-    {
-        return $this->next($request, $default);
-    }
-
-    /**
-     * @param ServerRequestInterface $request
-     * @param callable $default
-     * @return ResponseInterface
-     */
-    public function next(ServerRequestInterface $request, callable $default): ResponseInterface
-    {
-        if ($this->queue->isEmpty()) {
-            return $default($request);
-        }
-
-        $current = $this->queue->dequeue();
-
-        return $current($request, function (ServerRequestInterface $request) use ($default) {
-            return $this->next($request, $default);
-        });
     }
 }

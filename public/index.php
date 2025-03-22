@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use App\Http\Action;
+use App\Http\Middleware\BasicAuthMiddleware;
 use Aura\Router\RouterContainer;
 use Framework\Http\ActionResolver;
 use Framework\Http\Router\AuraRouterAdapter;
@@ -9,6 +10,7 @@ use Framework\Http\Router\Exception\RequestNotMatchedException;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
+use Psr\Http\Message\ServerRequestInterface;
 
 chdir(dirname(__DIR__));
 require 'vendor/autoload.php';
@@ -35,7 +37,14 @@ $routes = $aura->getMap();
 $routes->get('home', '/', Action\HelloAction::class);
 $routes->get('about', '/about', Action\AboutAction::class);
 
-$routes->get('cabinet', '/cabinet', new Action\CabinetAction($params['users']));
+$routes->get('cabinet', '/cabinet', function (ServerRequestInterface $request) use ($params) {
+    $auth = new BasicAuthMiddleware($params['users']);
+    $cabinet = new Action\CabinetAction();
+
+    return $auth($request, function (ServerRequestInterface $request) use ($cabinet) {
+        return $cabinet($request);
+    });
+});
 
 $routes->get('blog', '/blog', Action\Blog\IndexAction::class);
 $routes->get('blog_show', '/blog/{id}', Action\Blog\ShowAction::class)->tokens(['id' => '\d+']);

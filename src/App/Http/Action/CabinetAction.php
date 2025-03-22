@@ -2,26 +2,16 @@
 
 namespace App\Http\Action;
 
-use Laminas\Diactoros\Response\EmptyResponse;
+use App\Http\Middleware\BasicAuthMiddleware;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Psr\Http\Message\ServerRequestInterface;
 
 readonly class CabinetAction
 {
-    public function __construct(private array $users) { }
-
-    public function __invoke(ServerRequestInterface $request): EmptyResponse|HtmlResponse
+    public function __invoke(ServerRequestInterface $request): HtmlResponse
     {
-        $username = $request->getServerParams()['PHP_AUTH_USER'] ?? null;
-        $password = $request->getServerParams()['PHP_AUTH_PW'] ?? null;
-        if (!empty($username) && !empty($password)) {
-            foreach ($this->users as $name => $pass) {
-                if ($username === $name && $password === $pass) {
-                    return new  HtmlResponse('I am logged in as ' . $username);
-                }
-            }
-        }
+        $username = $request->getAttribute(BasicAuthMiddleware::ATTRIBUTE);
 
-        return new EmptyResponse(401, ['WWW-Authenticate' => 'Basic realm=Restricted area']);
+        return new HtmlResponse('I am logged in as ' . $username);
     }
 }

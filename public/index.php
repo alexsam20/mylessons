@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 use App\Http\Action;
-use App\Http\Middleware\BasicAuthMiddleware;
+use App\Http\Middleware;
 use Aura\Router\RouterContainer;
 use Framework\Http\ActionResolver;
 use Framework\Http\Router\AuraRouterAdapter;
@@ -38,11 +38,14 @@ $routes->get('home', '/', Action\HelloAction::class);
 $routes->get('about', '/about', Action\AboutAction::class);
 
 $routes->get('cabinet', '/cabinet', function (ServerRequestInterface $request) use ($params) {
-    $auth = new BasicAuthMiddleware($params['users']);
+    $profiler = new Middleware\ProfilerMiddleware();
+    $auth = new Middleware\BasicAuthMiddleware($params['users']);
     $cabinet = new Action\CabinetAction();
 
-    return $auth($request, function (ServerRequestInterface $request) use ($cabinet) {
-        return $cabinet($request);
+    return $profiler($request, function (ServerRequestInterface $request) use ($auth, $cabinet) {
+        return $auth($request, function (ServerRequestInterface $request) use ($cabinet) {
+            return $cabinet($request);
+        });
     });
 });
 

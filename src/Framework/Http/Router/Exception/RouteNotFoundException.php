@@ -2,7 +2,6 @@
 
 namespace Framework\Http\Router\Exception;
 
-use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 
 class RouteNotFoundException extends \LogicException

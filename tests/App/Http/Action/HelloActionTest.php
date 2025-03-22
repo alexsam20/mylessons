@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class HelloActionTest extends TestCase
 {
-    public function testGuest()
+    public function testGuest(): void
     {
         $action = new HelloAction();
 
@@ -19,15 +19,15 @@ class HelloActionTest extends TestCase
         self::assertEquals('Hello, Guest!', $response->getBody()->getContents());
     }
 
-    public function testJson()
+    public function testJson(): void
     {
         $action = new HelloAction();
 
         $request = (new ServerRequest())
-            ->withQueryParams(['name' => 'John']);
+            ->withQueryParams(['name' => 'Alex']);
 
         $response = $action($request);
 
-        self::assertEquals('Hello, John!', $response->getBody()->getContents());
+        self::assertEquals('Hello, Alex!', $response->getBody()->getContents());
     }
 }

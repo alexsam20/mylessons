@@ -1,10 +1,11 @@
 <?php
 declare(strict_types=1);
 
+use Aura\Router\RouterContainer;
 use Framework\Http\ActionResolver;
+use Framework\Http\Router\AuraRouterAdapter;
 use Framework\Http\Router\Exception\RequestNotMatchedException;
-use Framework\Http\Router\SimpleRouter;
-use Laminas\Diactoros\Response\JsonResponse;
+use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 
@@ -23,7 +24,7 @@ function print_pre(mixed $var, int|bool|string $flag = 0): void
 }
 ### Initialization
 
-$aura = new \Aura\Router\RouterContainer();
+$aura = new RouterContainer();
 $routes = $aura->getMap();
 
 $routes->get('home', '/', App\Http\Action\HelloAction::class);
@@ -31,7 +32,7 @@ $routes->get('about', '/about', App\Http\Action\AboutAction::class);
 $routes->get('blog', '/blog', App\Http\Action\Blog\IndexAction::class);
 $routes->get('blog_show', '/blog/{id}', App\Http\Action\Blog\ShowAction::class)->tokens(['id' => '\d+']);
 
-$router = new \Framework\Http\Router\AuraRouterAdapter($aura);
+$router = new AuraRouterAdapter($aura);
 $resolver = new ActionResolver();
 
 ### Running
@@ -45,7 +46,7 @@ try{
     $action = $resolver->resolve($result->getHandler());
     $response = $action($request);
 } catch (RequestNotMatchedException $e) {
-    $response = new JsonResponse(['error' => 'Undefined page'], 404);
+    $response = new HtmlResponse('Undefined page', 404);
 }
 
 ### Postprocessing

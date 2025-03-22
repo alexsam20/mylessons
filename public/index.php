@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 
+use App\Http\Action;
 use Aura\Router\RouterContainer;
 use Framework\Http\ActionResolver;
 use Framework\Http\Router\AuraRouterAdapter;
@@ -24,13 +25,20 @@ function print_pre(mixed $var, int|bool|string $flag = 0): void
 }
 ### Initialization
 
+$params = [
+    'users' => ['admin' => 'password', 'alex' => '12345678']
+];
+
 $aura = new RouterContainer();
 $routes = $aura->getMap();
 
-$routes->get('home', '/', App\Http\Action\HelloAction::class);
-$routes->get('about', '/about', App\Http\Action\AboutAction::class);
-$routes->get('blog', '/blog', App\Http\Action\Blog\IndexAction::class);
-$routes->get('blog_show', '/blog/{id}', App\Http\Action\Blog\ShowAction::class)->tokens(['id' => '\d+']);
+$routes->get('home', '/', Action\HelloAction::class);
+$routes->get('about', '/about', Action\AboutAction::class);
+
+$routes->get('cabinet', '/cabinet', new Action\CabinetAction($params['users']));
+
+$routes->get('blog', '/blog', Action\Blog\IndexAction::class);
+$routes->get('blog_show', '/blog/{id}', Action\Blog\ShowAction::class)->tokens(['id' => '\d+']);
 
 $router = new AuraRouterAdapter($aura);
 $resolver = new ActionResolver();

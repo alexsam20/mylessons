@@ -46,9 +46,7 @@ $routes->get('cabinet', '/cabinet', function (ServerRequestInterface $request) u
     $pipeline->pipe(new Middleware\BasicAuthMiddleware($params['users']));
     $pipeline->pipe(new Action\CabinetAction());
 
-    return $pipeline($request, function (){
-        return new HtmlResponse('Undefined page', 404);
-    });
+    return $pipeline($request, new Middleware\NotFoundHandler());
 });
 
 $routes->get('blog', '/blog', Action\Blog\IndexAction::class);
@@ -68,7 +66,8 @@ try{
     $action = $resolver->resolve($result->getHandler());
     $response = $action($request);
 } catch (RequestNotMatchedException $e) {
-    $response = new HtmlResponse('Undefined page', 404);
+    $handler = new Middleware\NotFoundHandler();
+    $response = $handler($request);
 }
 
 ### Postprocessing

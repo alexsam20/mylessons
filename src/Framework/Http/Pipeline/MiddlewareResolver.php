@@ -1,10 +1,10 @@
 <?php
 
-namespace Framework\Http;
+namespace Framework\Http\Pipeline;
 
 use function is_string;
 
-class ActionResolver
+class MiddlewareResolver
 {
     /**
      * @param $handler

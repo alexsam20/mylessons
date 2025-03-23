@@ -10,6 +10,8 @@ use Framework\Http\Router\AuraRouterAdapter;
 use Framework\Http\Router\Exception\RequestNotMatchedException;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 chdir(dirname(__DIR__));
 require 'vendor/autoload.php';
@@ -51,8 +53,9 @@ $router = new AuraRouterAdapter($aura);
 $resolver = new MiddlewareResolver();
 $app = new Application($resolver, new Middleware\NotFoundHandler());
 
-$app->pipe(Middleware\ProfilerMiddleware::class);
+$app->pipe(Middleware\CredentialsMiddleware::class);
 
+$app->pipe(Middleware\ProfilerMiddleware::class);
 ### Running
 
 $request = ServerRequestFactory::fromGlobals();
@@ -65,10 +68,6 @@ try{
 } catch (RequestNotMatchedException $e) {}
 
 $response = $app->run($request);
-
-### Postprocessing
-
-$response = $response->withHeader('X-Developer', 'AlexSaM');
 
 ### Sending
 

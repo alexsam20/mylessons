@@ -13,6 +13,10 @@ class Next
         $this->next = $next;
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface
+     */
     public function __invoke(ServerRequestInterface $request): ResponseInterface
     {
         if ($this->queue->isEmpty()) {

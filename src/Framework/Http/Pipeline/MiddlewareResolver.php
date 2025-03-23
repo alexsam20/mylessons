@@ -27,6 +27,10 @@ class MiddlewareResolver
         return $handler;
     }
 
+    /**
+     * @param array $handlers
+     * @return Pipeline
+     */
     private function createPipe(array $handlers): Pipeline
     {
         $pipeline = new Pipeline();

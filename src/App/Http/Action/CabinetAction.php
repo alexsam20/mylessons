@@ -8,6 +8,10 @@ use Psr\Http\Message\ServerRequestInterface;
 
 readonly class CabinetAction
 {
+    /**
+     * @param ServerRequestInterface $request
+     * @return HtmlResponse
+     */
     public function __invoke(ServerRequestInterface $request): HtmlResponse
     {
         $username = $request->getAttribute(BasicAuthMiddleware::ATTRIBUTE);

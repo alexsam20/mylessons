@@ -2,6 +2,7 @@
 
 namespace Framework\Http\Pipeline;
 
+use Psr\Http\Message\ServerRequestInterface;
 use function is_string;
 
 class MiddlewareResolver
@@ -12,6 +13,13 @@ class MiddlewareResolver
      */
     public static function resolve($handler): callable
     {
-        return is_string($handler) ? new $handler() : $handler;
+        if(is_string($handler)) {
+            return static function (ServerRequestInterface $request, callable $next) use ($handler) {
+                $object = new $handler();
+                return $object($request, $next);
+            };
+        }
+
+        return $handler;
     }
 }

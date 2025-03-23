@@ -8,20 +8,20 @@ use SplQueue;
 
 class Next
 {
-    private $default;
-    public function __construct(private readonly SplQueue $queue, callable $default) {
-        $this->default = $default;
+    private $next;
+    public function __construct(private readonly SplQueue $queue, callable $next) {
+        $this->next = $next;
     }
 
     public function __invoke(ServerRequestInterface $request): ResponseInterface
     {
         if ($this->queue->isEmpty()) {
-            return ($this->default)($request);
+            return ($this->next)($request);
         }
 
-        $current = $this->queue->dequeue();
+        $middleware = $this->queue->dequeue();
 
-        return $current($request, function (ServerRequestInterface $request) {
+        return $middleware($request, function (ServerRequestInterface $request) {
             return $this($request);
         });
     }

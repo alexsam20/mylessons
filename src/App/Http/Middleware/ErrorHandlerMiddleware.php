@@ -12,7 +12,12 @@ readonly class ErrorHandlerMiddleware
     public function __construct(private bool $debug = false)
     { }
 
-    public function __invoke(ServerRequestInterface $request, callable $next)
+    /**
+     * @param ServerRequestInterface $request
+     * @param callable $next
+     * @return HtmlResponse|JsonResponse
+     */
+    public function __invoke(ServerRequestInterface $request, callable $next): JsonResponse|HtmlResponse
     {
         try {
             return $next($request);
@@ -22,7 +27,7 @@ readonly class ErrorHandlerMiddleware
                     'error' => 'Server error',
                     'code' => $e->getCode(),
                     'message' => $e->getMessage(),
-                    'trace' => $e->getTrace(),
+                    /*'trace' => $e->getTrace(),*/
                 ], 500);
             }
             return new HtmlResponse('Server error', 500);

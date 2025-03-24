@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ServerRequestInterface;
@@ -15,9 +16,9 @@ readonly class ErrorHandlerMiddleware
     /**
      * @param ServerRequestInterface $request
      * @param callable $next
-     * @return HtmlResponse|JsonResponse
+     * @return mixed
      */
-    public function __invoke(ServerRequestInterface $request, callable $next): JsonResponse|HtmlResponse
+    public function __invoke(ServerRequestInterface $request, callable $next): mixed
     {
         try {
             return $next($request);

@@ -29,10 +29,11 @@ class Application extends Pipeline
 
     /**
      * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
      * @return ResponseInterface
      */
-    public function run(ServerRequestInterface $request): ResponseInterface
+    public function run(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        return $this($request, $this->default);
+        return $this($request, $response, $this->default);
     }
 }

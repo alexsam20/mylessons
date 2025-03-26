@@ -2,8 +2,13 @@
 
 namespace Framework\Http\Pipeline;
 
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use ReflectionObject;
+use function count;
 use function is_array;
+use function is_object;
 use function is_string;
 
 class MiddlewareResolver
@@ -17,14 +22,35 @@ class MiddlewareResolver
         if (is_array($handler)) {
             return $this->createPipe($handler);
         }
-        if(is_string($handler)) {
-            return static function (ServerRequestInterface $request, callable $next) use ($handler) {
-                $object = new $handler();
-                return $object($request, $next);
+        if (is_string($handler)) {
+            return function (ServerRequestInterface $request, ResponseInterface $response, callable $next) use ($handler) {
+                $middleware = $this->resolve(new $handler());
+                return $middleware($request, $response, $next);
             };
         }
 
-        return $handler;
+        if ($handler instanceof MiddlewareInterface) {
+            return static function (ServerRequestInterface $request, ResponseInterface $response, callable $next) use ($handler) {
+                return $handler->process($request, new InteropHandlerWrapper($next));
+            };
+        }
+
+        if (is_object($handler)) {
+            $reflection = new ReflectionObject($handler);
+            if ($reflection->hasMethod('__invoke')) {
+                $method = $reflection->getMethod('__invoke');
+                $parameters = $method->getParameters();
+                if (count($parameters) === 2 && $parameters[1]->isCallable()) {
+                    return static function (ServerRequestInterface $request, ResponseInterface $response, callable $next) use ($handler) {
+                        return $handler($request, $next);
+                    };
+                }
+                return $handler;
+            }
+        }
+
+        throw new UnknownMiddlewareTypeException($handler);
+
     }
 
     /**

@@ -15,18 +15,19 @@ class Next
 
     /**
      * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
      * @return ResponseInterface
      */
-    public function __invoke(ServerRequestInterface $request): ResponseInterface
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         if ($this->queue->isEmpty()) {
-            return ($this->next)($request);
+            return ($this->next)($request, $response);
         }
 
         $middleware = $this->queue->dequeue();
 
-        return $middleware($request, function (ServerRequestInterface $request) {
-            return $this($request);
+        return $middleware($request, $response, function (ServerRequestInterface $request) use ($response) {
+            return $this($request, $response);
         });
     }
 }

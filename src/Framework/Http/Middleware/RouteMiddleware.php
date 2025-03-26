@@ -2,7 +2,6 @@
 
 namespace Framework\Http\Middleware;
 
-use Framework\Http\Pipeline\MiddlewareResolver;
 use Framework\Http\Router\Exception\RequestNotMatchedException;
 use Framework\Http\Router\Result;
 use Framework\Http\Router\Router;
